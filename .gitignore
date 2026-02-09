@@ -399,3 +399,8 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# SQLite-databasefiler
+/data/*.db
+/data/*.db-shm
+/data/*.db-wal
