@@ -45,6 +45,17 @@ namespace CaseOppgaveTeam4
                 """);
 
                 connection.Execute("""
+                    CREATE TABLE IF NOT EXISTS students (
+                    student_id UUID PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    birthdate TEXT NOT NULL,
+                    city TEXT NOT NULL, 
+                    last_event_id UUID NOT NULL,
+                    last_updated_utc TIMESTAMP NOT NULL
+                );
+                """);
+
+                connection.Execute("""
                     CREATE INDEX IF NOT EXISTS idx_events_student ON events(student_id);
                 """);
             }
@@ -54,6 +65,9 @@ namespace CaseOppgaveTeam4
                 using var reader = new StreamReader(context.Request.Body);
                 var json = await reader.ReadToEndAsync();
                 Console.WriteLine($"Motatt data: {json}");
+
+                // 
+                
                 //using (var connection = new SqliteConnection(connectionString))
                 //{
                 //    await connection.OpenAsync();
