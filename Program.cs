@@ -36,11 +36,10 @@ namespace CaseOppgaveTeam4
                         occured_utc TIMESTAMP NOT NULL,
                         recorded_utc TIMESTAMP NOT NULL,
                         type TEXT NOT NULL,
-                        student_id UUID NULL,
                         course TEXT NULL,
                         year INT NULL,
                         semester INT NULL,
-                        payload JSONB NOT NULL
+                        FOREIGN KEY(student_id) REFERENCES students(student_id)
                     );
                 """);
 
