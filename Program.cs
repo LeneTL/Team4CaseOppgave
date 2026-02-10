@@ -49,9 +49,19 @@ namespace CaseOppgaveTeam4
                 """);
             }
 
-            app.MapPost("/events", async (HttpRequest request) =>
+            app.MapPost("/events", async (HttpContext context) =>
             {
-                
+                using var reader = new StreamReader(context.Request.Body);
+                var json = await reader.ReadToEndAsync();
+                Console.WriteLine($"Motatt data: {json}");
+                //using (var connection = new SqliteConnection(connectionString))
+                //{
+                //    await connection.OpenAsync();
+                //    var insertCmd = new SqliteCommand("...");
+                //    insertCmd.Parameters.AddWithValue("@...", json);
+                //}
+                //return Results.Ok(new { ok = true, message = "Data motatt og lagret" });
+                return Results.Ok(new { ok = true, message = "Data motatt!" });
             });
 
             app.MapGet("/events/count", async () =>
