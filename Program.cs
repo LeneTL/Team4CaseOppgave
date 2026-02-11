@@ -127,8 +127,8 @@ namespace CaseOppgaveTeam4
                         new
                         {
                             eventId = root.GetProperty("eventId").GetString(),
-                            occurred = root.GetProperty("occurred_utc").GetString(),
-                            recorded = root.GetProperty("recorded_utc").GetString(),
+                            occurred = root.GetProperty("occurredUtc").GetString(),
+                            recorded = root.GetProperty("recordedUtc").GetString(),
                             type = root.GetProperty("type").GetString(),
                             course = root.GetProperty("course").GetString(),
                             year = root.GetProperty("year").GetInt32(),
