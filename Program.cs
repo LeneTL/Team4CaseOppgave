@@ -33,8 +33,8 @@ namespace CaseOppgaveTeam4
                 connection.Execute("""
                     CREATE TABLE IF NOT EXISTS students (
                     student_id UUID PRIMARY KEY,
-                    event_id UUID NOT NULL UNIQUE,
-                    occured_utc TIMESTAMP NOT NULL,
+                    event_id TEXT NOT NULL,
+                    occurred_utc TIMESTAMP NOT NULL,
                     recorded_utc TIMESTAMP NOT NULL,
                     name TEXT NOT NULL,
                     birthdate TEXT NOT NULL,
@@ -44,13 +44,13 @@ namespace CaseOppgaveTeam4
 
                 connection.Execute("""
                     CREATE TABLE IF NOT EXISTS events (
-                        event_id UUID PRIMARY KEY,
-                        occured_utc TIMESTAMP NOT NULL,
+                        event_id TEXT PRIMARY KEY,
+                        occurred_utc TIMESTAMP NOT NULL,
                         recorded_utc TIMESTAMP NOT NULL,
                         type TEXT NOT NULL,
                         course TEXT NULL,
-                        year INT NULL,
-                        semester INT NULL,
+                        year TEXT NULL,
+                        semester TEXT NULL,
                         student_id TEXT,
                         FOREIGN KEY(student_id) REFERENCES students(student_id)
                         
@@ -73,7 +73,7 @@ namespace CaseOppgaveTeam4
 
 
                 var type = root.GetProperty("type").GetString();
-                string? currstudentId = null;
+                // string? currstudentId = null;
                 
 
                 using var connection = new SqliteConnection(connectionString);
@@ -85,33 +85,31 @@ namespace CaseOppgaveTeam4
                     await connection.ExecuteAsync("""
                                                       INSERT INTO students (student_id,
                                                       event_id, 
-                                                      occured_utc, 
+                                                      occurred_utc, 
                                                       recorded_utc, 
                                                       name, 
                                                       birthdate, 
                                                       city)
-                                                      VALUES (@studentId, @eventId, @occured, @recorded, @name, @birth, @city)
+                                                      VALUES (@studentId, @eventId, @occurred, @recorded, @name, @birth, @city)
                                                   """,
                         new
                         {
                             studentId = newStudentId,
                             eventId = root.GetProperty("eventId").GetString(),
-                            occured = root.GetProperty("occurredUtc").GetString(),
+                            occurred = root.GetProperty("occurredUtc").GetString(),
                             recorded = root.GetProperty("recordedUtc").GetString(),
                             name = root.GetProperty("name").GetString(),
                             birth = root.GetProperty("birthdate").GetString(),
                             city = root.GetProperty("city").GetString()
                     });
-                    return Results.Ok(new { ok = true, currstudentId = newStudentId });
+                    return Results.Ok(new { ok = true});
 
-                }
-
-                if (type != "student_registrert")
+                } else
                 {
                     await connection.ExecuteAsync("""
                                                   INSERT INTO events(
                                                       event_id,
-                                                      occured_utc,
+                                                      occurred_utc,
                                                       recorded_utc,
                                                       type,
                                                       course,
@@ -119,18 +117,18 @@ namespace CaseOppgaveTeam4
                                                       semester,
                                                       student_id
                                                   )
-                                                  VALUES (@eventid, @occured, @recorded, @type, @course, @year, @semester, @studentid)
+                                                  VALUES (@eventId, @occurred, @recorded, @type, @course, @year, @semester, @studentid)
                                                   """,
                         new
                         {
-                            eventid = root.GetProperty("eventId").GetString(),
-                            occured = root.GetProperty("occured_utc").GetString(),
+                            eventId = root.GetProperty("eventId").GetString(),
+                            occurred = root.GetProperty("occurred_utc").GetString(),
                             recorded = root.GetProperty("recorded_utc").GetString(),
                             type = root.GetProperty("type").GetString(),
                             course = root.GetProperty("course").GetString(),
                             year = root.GetProperty("year").GetString(),
                             semester = root.GetProperty("semester").GetString(),
-                            studentid = currstudentId
+                            studentid = "HEI"
 
                         });
                             
@@ -139,6 +137,7 @@ namespace CaseOppgaveTeam4
                 }
                 return null;
 
+                return null;
             });
 
             app.MapGet("/events/count", async () =>
