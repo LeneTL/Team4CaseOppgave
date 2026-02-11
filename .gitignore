@@ -404,3 +404,4 @@ FodyWeavers.xsd
 /data/*.db
 /data/*.db-shm
 /data/*.db-wal
+/Program.cs

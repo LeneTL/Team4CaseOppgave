@@ -73,7 +73,8 @@ namespace CaseOppgaveTeam4
 
 
                 var type = root.GetProperty("type").GetString();
-                string? studentId = null;
+                string? currstudentId = null;
+                
 
                 using var connection = new SqliteConnection(connectionString);
                 await connection.OpenAsync();
@@ -101,14 +102,42 @@ namespace CaseOppgaveTeam4
                             birth = root.GetProperty("birthdate").GetString(),
                             city = root.GetProperty("city").GetString()
                     });
-                    return Results.Ok(new { ok = true, studentId = newStudentId });
+                    return Results.Ok(new { ok = true, currstudentId = newStudentId });
 
                 }
-                else
+
+                if (type != "student_registrert")
                 {
-                    return Results.Ok();
-                }
+                    await connection.ExecuteAsync("""
+                                                  INSERT INTO events(
+                                                      event_id,
+                                                      occured_utc,
+                                                      recorded_utc,
+                                                      type,
+                                                      course,
+                                                      year,
+                                                      semester,
+                                                      student_id
+                                                  )
+                                                  VALUES (@eventid, @occured, @recorded, @type, @course, @year, @semester, @studentid)
+                                                  """,
+                        new
+                        {
+                            eventid = root.GetProperty("eventId").GetString(),
+                            occured = root.GetProperty("occured_utc").GetString(),
+                            recorded = root.GetProperty("recorded_utc").GetString(),
+                            type = root.GetProperty("type").GetString(),
+                            course = root.GetProperty("course").GetString(),
+                            year = root.GetProperty("year").GetString(),
+                            semester = root.GetProperty("semester").GetString(),
+                            studentid = currstudentId
 
+                        });
+                            
+                            
+                    return Results.Ok(new {ok = true});
+                }
+                return null;
 
             });
 
