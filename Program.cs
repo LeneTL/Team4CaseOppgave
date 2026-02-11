@@ -33,7 +33,7 @@ namespace CaseOppgaveTeam4
                 connection.Execute("""
                     CREATE TABLE IF NOT EXISTS students (
                     student_id UUID PRIMARY KEY,
-                    event_id UUID NOT NULL UNIQUE,
+                    event_id UUID NOT NULL,
                     occured_utc TIMESTAMP NOT NULL,
                     recorded_utc TIMESTAMP NOT NULL,
                     name TEXT NOT NULL,
@@ -49,8 +49,8 @@ namespace CaseOppgaveTeam4
                         recorded_utc TIMESTAMP NOT NULL,
                         type TEXT NOT NULL,
                         course TEXT NULL,
-                        year INT NULL,
-                        semester INT NULL,
+                        year TEXT NULL,
+                        semester TEXT NULL,
                         student_id TEXT,
                         FOREIGN KEY(student_id) REFERENCES students(student_id)
                         
@@ -139,6 +139,7 @@ namespace CaseOppgaveTeam4
                 }
 
 
+                return null;
             });
 
             app.MapGet("/events/count", async () =>
