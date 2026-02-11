@@ -135,7 +135,6 @@ namespace CaseOppgaveTeam4
                             
                     return Results.Ok(new {ok = true});
                 }
-                return null;
 
                 return null;
             });
@@ -143,7 +142,7 @@ namespace CaseOppgaveTeam4
             app.MapGet("/events/count", async () =>
             {
                 using var connection = new SqliteConnection(connectionString);
-                var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM events");
+                var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(student_id) FROM events");
                 return Results.Ok(new { count });
             });
 
