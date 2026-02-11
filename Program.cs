@@ -33,6 +33,9 @@ namespace CaseOppgaveTeam4
                 connection.Execute("""
                     CREATE TABLE IF NOT EXISTS students (
                     student_id UUID PRIMARY KEY,
+                    event_id UUID NOT NULL UNIQUE,
+                    occured_utc TIMESTAMP NOT NULL,
+                    recorded_utc TIMESTAMP NOT NULL,
                     name TEXT NOT NULL,
                     birthdate TEXT NOT NULL,
                     city TEXT NOT NULL 
@@ -48,7 +51,7 @@ namespace CaseOppgaveTeam4
                         course TEXT NULL,
                         year INT NULL,
                         semester INT NULL,
-                        student_id TEXT NOT NULL,
+                        student_id TEXT,
                         FOREIGN KEY(student_id) REFERENCES students(student_id)
                         
                     );
@@ -65,18 +68,48 @@ namespace CaseOppgaveTeam4
             {
                 using var reader = new StreamReader(context.Request.Body);
                 var json = await reader.ReadToEndAsync();
+                var root = JsonDocument.Parse(json).RootElement;
                 Console.WriteLine($"Motatt data: {json}");
 
-                // 
-                
-                //using (var connection = new SqliteConnection(connectionString))
-                //{
-                //    await connection.OpenAsync();
-                //    var insertCmd = new SqliteCommand("...");
-                //    insertCmd.Parameters.AddWithValue("@...", json);
-                //}
-                //return Results.Ok(new { ok = true, message = "Data motatt og lagret" });
-                return Results.Ok(new { ok = true, message = "Data motatt!" });
+
+                var type = root.GetProperty("type").GetString();
+                string? studentId = null;
+
+                using var connection = new SqliteConnection(connectionString);
+                await connection.OpenAsync();
+                if (type == "student_registrert")
+                {
+                    var newStudentId = Guid.NewGuid().ToString();
+
+                    await connection.ExecuteAsync("""
+                                                      INSERT INTO students (student_id,
+                                                      event_id, 
+                                                      occured_utc, 
+                                                      recorded_utc, 
+                                                      name, 
+                                                      birthdate, 
+                                                      city)
+                                                      VALUES (@studentId, @eventId, @occured, @recorded, @name, @birth, @city)
+                                                  """,
+                        new
+                        {
+                            studentId = newStudentId,
+                            eventId = root.GetProperty("eventId").GetString(),
+                            occured = root.GetProperty("occurredUtc").GetString(),
+                            recorded = root.GetProperty("recordedUtc").GetString(),
+                            name = root.GetProperty("name").GetString(),
+                            birth = root.GetProperty("birthdate").GetString(),
+                            city = root.GetProperty("city").GetString()
+                    });
+                    return Results.Ok(new { ok = true, studentId = newStudentId });
+
+                }
+                else
+                {
+                    return Results.Ok();
+                }
+
+
             });
 
             app.MapGet("/events/count", async () =>
