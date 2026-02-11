@@ -36,6 +36,7 @@ namespace CaseOppgaveTeam4
                     event_id TEXT NOT NULL,
                     occurred_utc TIMESTAMP NOT NULL,
                     recorded_utc TIMESTAMP NOT NULL,
+                    type TEXT NOT NULL,
                     name TEXT NOT NULL,
                     birthdate TEXT NOT NULL,
                     city TEXT NOT NULL 
@@ -73,7 +74,7 @@ namespace CaseOppgaveTeam4
 
 
                 var type = root.GetProperty("type").GetString();
-                // string? currstudentId = null;
+                string? currstudentId = null;
                 
 
                 using var connection = new SqliteConnection(connectionString);
@@ -83,14 +84,16 @@ namespace CaseOppgaveTeam4
                     var newStudentId = Guid.NewGuid().ToString();
 
                     await connection.ExecuteAsync("""
-                                                      INSERT INTO students (student_id,
+                                                      INSERT INTO students (
+                                                      student_id,
                                                       event_id, 
                                                       occurred_utc, 
-                                                      recorded_utc, 
+                                                      recorded_utc,
+                                                      type,
                                                       name, 
                                                       birthdate, 
                                                       city)
-                                                      VALUES (@studentId, @eventId, @occurred, @recorded, @name, @birth, @city)
+                                                      VALUES (@studentId, @eventId, @occurred, @recorded, @type, @name, @birth, @city)
                                                   """,
                         new
                         {
@@ -98,16 +101,18 @@ namespace CaseOppgaveTeam4
                             eventId = root.GetProperty("eventId").GetString(),
                             occurred = root.GetProperty("occurredUtc").GetString(),
                             recorded = root.GetProperty("recordedUtc").GetString(),
+                            type = root.GetProperty("type").GetString(),
                             name = root.GetProperty("name").GetString(),
                             birth = root.GetProperty("birthdate").GetString(),
                             city = root.GetProperty("city").GetString()
                     });
                     return Results.Ok(new { ok = true});
 
-                } else
+                } 
+                if (type != "student_registrert")
                 {
                     await connection.ExecuteAsync("""
-                                                  INSERT INTO events(
+                                                  INSERT INTO events (
                                                       event_id,
                                                       occurred_utc,
                                                       recorded_utc,
@@ -126,9 +131,9 @@ namespace CaseOppgaveTeam4
                             recorded = root.GetProperty("recorded_utc").GetString(),
                             type = root.GetProperty("type").GetString(),
                             course = root.GetProperty("course").GetString(),
-                            year = root.GetProperty("year").GetString(),
-                            semester = root.GetProperty("semester").GetString(),
-                            studentid = "HEI"
+                            year = root.GetProperty("year").GetInt32(),
+                            semester = root.GetProperty("semester").GetInt32(),
+                            studentid = currstudentId
 
                         });
                             
