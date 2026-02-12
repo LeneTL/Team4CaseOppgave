@@ -50,8 +50,8 @@ namespace CaseOppgaveTeam4
                         recorded_utc TIMESTAMP NOT NULL,
                         type TEXT NOT NULL,
                         course TEXT NULL,
-                        year TEXT NULL,
-                        semester TEXT NULL,
+                        year INTEGER  NULL,
+                        semester INTEGER  NULL,
                         student_id TEXT,
                         FOREIGN KEY(student_id) REFERENCES students(student_id)
                         
@@ -106,7 +106,7 @@ namespace CaseOppgaveTeam4
                             birth = root.GetProperty("birthdate").GetString(),
                             city = root.GetProperty("city").GetString()
                     });
-                    return Results.Ok(new { ok = true});
+                    return Results.Ok(new { ok = true, studentId = newStudentId });
 
                 } 
                 if (type != "student_registrert")
@@ -127,13 +127,13 @@ namespace CaseOppgaveTeam4
                         new
                         {
                             eventId = root.GetProperty("eventId").GetString(),
-                            occurred = root.GetProperty("occurred_utc").GetString(),
-                            recorded = root.GetProperty("recorded_utc").GetString(),
+                            occurred = root.GetProperty("occurredUtc").GetString(),
+                            recorded = root.GetProperty("recordedUtc").GetString(),
                             type = root.GetProperty("type").GetString(),
                             course = root.GetProperty("course").GetString(),
                             year = root.GetProperty("year").GetInt32(),
                             semester = root.GetProperty("semester").GetInt32(),
-                            studentid = currstudentId
+                            studentid = root.GetProperty("studentId").GetString(),
 
                         });
                             
