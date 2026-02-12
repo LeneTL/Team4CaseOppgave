@@ -58,7 +58,7 @@ namespace CaseOppgaveTeam4
                     );
                 """);
 
-                
+
 
                 connection.Execute("""
                     CREATE INDEX IF NOT EXISTS idx_events_student ON events(student_id);
@@ -75,16 +75,33 @@ namespace CaseOppgaveTeam4
 
                 var type = root.GetProperty("type").GetString();
                 string? currstudentId = null;
-                
+
+                //var currEventsId = root.GetProperty("eventId").GetString();
 
                 using var connection = new SqliteConnection(connectionString);
                 await connection.OpenAsync();
+
+                ////---------------------GetEventId
+                //var command = connection.CreateCommand();
+                //command.CommandText = "SELECT eventId FROM events WHERE currEventsId = $id";
+                //command.CommandText = "SELECT eventId FROM students WHERE currEventsId = $id";
+                //command.Parameters.AddWithValue("$id", currEventsId);
+                //var resultEventId = command.ExecuteScalar();
+
+
+                //if (currEventsId == resultEventId)
+                //{
+
+                //}
+
+
+
                 if (type == "student_registrert")
                 {
                     var newStudentId = Guid.NewGuid().ToString();
 
                     await connection.ExecuteAsync("""
-                                                      INSERT INTO students (
+                                                      INSERT OR IGNORE INTO students (
                                                       student_id,
                                                       event_id, 
                                                       occurred_utc, 
@@ -105,14 +122,14 @@ namespace CaseOppgaveTeam4
                             name = root.GetProperty("name").GetString(),
                             birth = root.GetProperty("birthdate").GetString(),
                             city = root.GetProperty("city").GetString()
-                    });
+                        });
                     return Results.Ok(new { ok = true, studentId = newStudentId });
 
-                } 
+                }
                 if (type != "student_registrert")
                 {
                     await connection.ExecuteAsync("""
-                                                  INSERT INTO events (
+                                                  INSERT OR IGNORE INTO events (
                                                       event_id,
                                                       occurred_utc,
                                                       recorded_utc,
@@ -136,9 +153,9 @@ namespace CaseOppgaveTeam4
                             studentid = root.GetProperty("studentId").GetString(),
 
                         });
-                            
-                            
-                    return Results.Ok(new {ok = true});
+
+
+                    return Results.Ok(new { ok = true });
                 }
 
                 return null;
@@ -162,5 +179,19 @@ namespace CaseOppgaveTeam4
 
             app.Run();
         }
+
+        //public string GetEventId(string currEventsId, string connectionString)
+        //{
+
+        //    using var connection = new SqliteConnection(connectionString);
+        //    connection.Open();
+        //    var command = connection.CreateCommand();
+
+        //    command.CommandText = "SELECT eventId FROM events WHERE currEventsId = $id";
+        //    command.Parameters.AddWithValue("$id", currEventsId);
+
+        //    var result = command.ExecuteScalar();
+        //    return Convert.ToString(result);
+        //}
     }
 }
