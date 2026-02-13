@@ -72,6 +72,47 @@ namespace CaseOppgaveTeam4
                 var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(student_id) FROM events");
                 return Results.Ok(new { count });
             });
+
+
+            app.MapGet("/students/course-status", async (string course, int year, int semester) =>
+            {
+                using var connection = new SqliteConnection(connectionString);
+
+                
+                var sql = """
+                              SELECT 
+                                  s.name AS StudentName, 
+                                  e.type AS CurrentStatus, 
+                                  e.course AS Course, 
+                                  e.year AS Year, 
+                                  e.semester AS Semester,
+                                  e.recorded_utc AS LastUpdated
+                              FROM students s
+                              JOIN events e ON s.student_id = e.student_id
+                              WHERE e.course = @course 
+                                AND e.year = @year 
+                                AND e.semester = @semester
+                                AND e.recorded_utc = (
+                                    SELECT MAX(recorded_utc) 
+                                    FROM events 
+                                    WHERE student_id = s.student_id 
+                                      AND course = @course 
+                                      AND year = @year 
+                                      AND semester = @semester
+                                )
+                              ORDER BY s.name ASC
+                          """;
+
+                var results = await connection.QueryAsync(sql, new { course, year, semester });
+
+                
+                return Results.Ok(new
+                {
+                    SearchCriteria = new { course, year, semester },
+                    Count = results.Count(),
+                    Students = results
+                });
+            });
         }
     }
 }
